@@ -138,8 +138,8 @@ public class Player : Character
     private void Attack()
     {
         Debug.Log("Attack");
-        isAttack = true;
         ChangeAnim("attack");
+        isAttack = true;
         Invoke(nameof(ResetAttack), 0.5f);
         ActiceAttack();
         Invoke(nameof(DeActiceAttack), 0.5f);
@@ -199,4 +199,3 @@ public class Player : Character
         }
     }
 }
-// ko dịch chuyển về vị trí đã lưu
