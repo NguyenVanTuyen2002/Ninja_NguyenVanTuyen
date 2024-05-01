@@ -20,9 +20,12 @@ public class Player : Character
     float horizontal;
     private int coin = 0;
     private Vector3 savePoint;
-    // Start is called before the first frame update
 
-    // Update is called once per frame
+    private void Awake()
+    {
+        coin = PlayerPrefs.GetInt("coin", 0);
+    }
+
     void Update()
     {
        
@@ -35,10 +38,11 @@ public class Player : Character
         //Debug.Log(CheckGround());
         isGrounded = CheckGround();
 
-        horizontal = Input.GetAxisRaw("Horizontal");
+        //horizontal = Input.GetAxisRaw("Horizontal");
 
         if (isAttack)
         {
+            rb.velocity = Vector2.zero;
             return;
         }
 
@@ -85,7 +89,7 @@ public class Player : Character
         //Moving
         if (Mathf.Abs(horizontal) > 0.1f)
         {
-            ChangeAnim("run");
+            //ChangeAnim("run");
             rb.velocity = new Vector2 (horizontal * speed, rb.velocity.y);
             transform.rotation = Quaternion.Euler(new Vector3(0, horizontal > 0 ? 0 : 180, 0));
         }
@@ -100,11 +104,13 @@ public class Player : Character
     public override void OnInit()
     {
         base.OnInit();
+        isDeath = false; 
         isAttack = false;
         transform.position = savePoint;
         ChangeAnim("idle");
         DeActiceAttack();
         SavePoint();
+        UIManager.instance.SetCoin(coin);
     }
 
     public override void OnDespawn()
@@ -135,7 +141,7 @@ public class Player : Character
         return hit.collider != null;
     }
 
-    private void Attack()
+    public void Attack()
     {
         Debug.Log("Attack");
         ChangeAnim("attack");
@@ -145,7 +151,7 @@ public class Player : Character
         Invoke(nameof(DeActiceAttack), 0.5f);
     }
 
-    private void Throw()
+    public void Throw()
     {
         ChangeAnim("throw");
         isAttack = true;
@@ -161,7 +167,7 @@ public class Player : Character
         ChangeAnim("idle");
     }
 
-    private void Jump()
+    public void Jump()
     {
         //Debug.Log("Jump");
         isJumping = true;
@@ -183,12 +189,18 @@ public class Player : Character
         attackArea.SetActive(false);
     }
 
+    public void SetMove(float horizontal)
+    {
+        this.horizontal = horizontal;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Coin"))
         {
-            Debug.Log("ăn coin ");
             coin++;
+            PlayerPrefs.SetInt("coin", coin);
+            UIManager.instance.SetCoin(coin);
             Destroy(collision.gameObject);
         }
 
